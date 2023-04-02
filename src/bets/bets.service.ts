@@ -50,7 +50,7 @@ export class BetsService {
       if (rankingIndex >= 0) {
         this.ranking[rankingIndex].score += total;
       }
-      console.log(rankingIndex, player.id);
+      this.ranking.sort((a, b) => b.score - a.score);
 
       player.points = total;
     });
