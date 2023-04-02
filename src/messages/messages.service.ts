@@ -46,11 +46,11 @@ export class MessagesService {
       this.players.push({
         id: i,
         name: `CPU ${i}`,
-        points: 100,
-        multiplier: Math.random() * 10,
+        points: 0,
+        multiplier: 0,
       });
     }
-
+    console.log('JOINED');
     return this.players;
   }
 

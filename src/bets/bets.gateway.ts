@@ -21,8 +21,8 @@ export class BetsGateway {
 
   @SubscribeMessage('betStart')
   async place(@MessageBody() createBetDto: CreateBetDto) {
-    const multiplier = await this.betsService.place(createBetDto);
-    this.server.emit('multiplier', multiplier);
+    const results = await this.betsService.place(createBetDto);
+    return results;
   }
 
   @SubscribeMessage('findAllBets')
@@ -30,9 +30,17 @@ export class BetsGateway {
     return this.betsService.findAll();
   }
 
+  @SubscribeMessage('rankingInit')
+  initialize(@MessageBody() playerEntry: CreateBetDto) {
+    this.betsService.initialize(playerEntry);
+  }
+
   @SubscribeMessage('getResults')
   async results() {
     const results = await this.betsService.resultList();
+    const ranking = await this.betsService.getRanking();
+
+    this.server.emit('ranking', ranking);
     return results;
   }
 }

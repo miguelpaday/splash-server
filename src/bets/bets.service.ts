@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { IPlayer } from 'src/messages/entities/player.entity';
 import { CreateBetDto } from './dto/create-bet.dto';
 import { UpdateBetDto } from './dto/update-bet.dto';
-import { Bet } from './entities/bet.entity';
+import { Bet, Ranking } from './entities/bet.entity';
 
 @Injectable()
 export class BetsService {
   players: Bet[] = [];
+  ranking: Ranking[] = [];
   selectedMultiplier: number = 0;
   max = 9;
 
@@ -30,19 +32,56 @@ export class BetsService {
       });
     }
 
-    return this.selectedMultiplier;
+    const players = this.players;
+    const multiplier = this.selectedMultiplier;
+
+    return { players, multiplier };
   }
 
   resultList() {
     this.players.forEach((player: Bet) => {
-      const total = Math.floor(player.points * player.multiplier);
-      player.points = player.multiplier < this.selectedMultiplier ? total : 0;
+      const total =
+        player.multiplier < this.selectedMultiplier
+          ? Math.floor(player.points * player.multiplier)
+          : 0;
+      const rankingIndex = this.ranking.findIndex(
+        (rank) => rank.id === player.id,
+      );
+      if (rankingIndex >= 0) {
+        this.ranking[rankingIndex].score += total;
+      }
+      console.log(rankingIndex, player.id);
+
+      player.points = total;
     });
-    console.log(this.players);
+
     return this.players;
   }
 
   findAll() {
     return `This action returns all bets`;
+  }
+
+  getRanking() {
+    console.log('ranking', this.ranking);
+    return this.ranking;
+  }
+
+  initialize(playerEntryDTO: CreateBetDto) {
+    this.ranking = [];
+    this.ranking.push({
+      id: playerEntryDTO.id,
+      name: playerEntryDTO.name,
+      score: playerEntryDTO.score,
+    });
+
+    for (let i = 1; i < 5; i++) {
+      this.ranking.push({
+        id: i,
+        name: `CPU ${i}`,
+        score: 1000,
+      });
+    }
+    console.log('AFTER', this.ranking);
   }
 }

@@ -4,3 +4,9 @@ export class Bet {
   points: number;
   multiplier: number;
 }
+
+export class Ranking {
+  id: number;
+  name: string;
+  score: number;
+}
